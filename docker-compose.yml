@@ -1,0 +1,45 @@
+version: "3.7"
+services:
+  logto-app:
+    container_name: logto-app
+      #depends_on:
+      #postgres:
+        # condition: service_healthy
+    image: ghcr.io/logto-io/logto:${TAG-latest}
+    entrypoint: ["sh", "-c", "npm run cli db seed -- --swe && npm start"]
+    ports:
+      - ${UPSTREAM_IP}:${PORT}:3001
+    environment:
+      - TRUST_PROXY_HEADER=${TRUST_PROXY_HEADER}
+      - DB_URL=${DB_URL}
+      # Mandatory for GitPod to map host env to the container, thus GitPod can dynamically configure the public URL of Logto;
+      # Or, you can leverage it for local testing.
+      - TZ=${TZ-Asia/Bangkok}
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      # - HTTPS_CERT_PATH=xxx
+      # - HTTPS_KEY_PATH=xxx
+      - ENDPOINT=${ENDPOINT}
+    networks:
+      - backend
+
+  postgres:
+    container_name: logto-pgsql
+    image: postgres:14-alpine
+    user: postgres
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASS}
+      TZ: ${TZ-Asia/Bangkok}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+networks:
+  backend:
+    external:
+        name: backend
