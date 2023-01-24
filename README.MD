@@ -1,6 +1,8 @@
 # Logto Application Deployment Guide
 This guide will walk you through the process of deploying the Logto application using Docker Compose.
 
+![Screenshot](logto-racksync.png)
+
 ## Prerequisites
 - Docker
 - Docker Compose
